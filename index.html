@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <script src="./script.js"></script>
+<title>Wiki Validator</title>
 <body>
     <div style="font-family: monospace">
         <div style="width: 80vw; display: grid; grid: repeat(2, 50%) / auto-flow">
-            <div>Old wikitext:</div>
+            <div>Paste old wikitext here:</div>
             <textarea id="old-text" style="resize: none; margin: 4px; height:10em"></textarea>
-            <div>New wikitext:</div>
+            <div>Paste generated wikitext here:</div>
             <textarea id="new-text" style="resize: none; margin: 4px; height:10em"></textarea>
         </div>
         <button id="compare">Compare</button>
         <h3 hidden="true" id="error-lbl">Errors:</h3>
         <ul id="errors"></ul>
-        <h3>Modified keys:</h3>
+        <h3>Modified parameters:</h3>
         <ul id="modified-keys" style="white-space-collapse: preserve-spaces"></ul>
-        <h3>Removed keys:</h3>
+        <h3>Removed parameters:</h3>
         <ul id="removed-keys" style="white-space-collapse: preserve-spaces"></ul>
-        <h3>Added keys:</h3>
+        <h3>Added parameters:</h3>
         <ul id="added-keys" style="white-space-collapse: preserve-spaces"></ul>
     </div>
 </body>
@@ -57,9 +58,5 @@
         else {
             errorLbl.hidden = true;
         }
-
-        //document.getElementById("removed-keys").innerText = result.removed;
-        //document.getElementById("added-keys").innerText = result.added;
-        //document.getElementById("modified-keys").innerText = result.modified;
     });
 </script>

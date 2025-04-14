@@ -43,12 +43,22 @@ function compare(oldText, newText) {
     let removedOutput = []
     let modifiedOutput = []
     let errorOutput = []
+    if (oldPkmnEntries.size !== 6) {
+        const errorEntry = document.createElement("li");
+        errorEntry.appendChild(document.createTextNode(`Old wikitext has ${oldPkmnEntries.size} Pokemon, most teams have 6. Make sure you copied the text correctly.`))
+        errorOutput.push(errorEntry)
+    }
+    if (newPkmnEntries.size !== 6) {
+        const errorEntry = document.createElement("li");
+        errorEntry.appendChild(document.createTextNode(`Generated wikitext has ${newPkmnEntries.size} Pokemon, most teams have 6. Make sure you copied the text correctly.`))
+        errorOutput.push(errorEntry)
+    }
     oldPkmnEntries.keys().forEach((pkmnName) => {
         // Find matching Pokemon entry
         const oldEntry = oldPkmnEntries.get(pkmnName);
         if (!newPkmnEntries.has(pkmnName)) {
             const errorEntry = document.createElement("li");
-            errorEntry.innerText = `Old wikitext has ${pkmnName} but new wikitext does not`
+            errorEntry.appendChild(document.createTextNode(`Old wikitext has ${pkmnName} but new wikitext does not.`))
             errorOutput.push(errorEntry);
             return;
         }
@@ -66,7 +76,7 @@ function compare(oldText, newText) {
                 return;
             }
             if (oldVal !== newVal) {
-                modifiedKeys.push(`${k}=${oldVal} -> ${k}=${newVal}`);
+                modifiedKeys.push(`${k}=${oldVal}`.padEnd(25, " ") + " -> " + `${k}=${newVal}`);
             }
         });
         newEntry.keys().forEach((k) => {
