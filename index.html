@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<script src="./script.js"></script>
+<body>
+    <div style="font-family: monospace">
+        <div style="width: 80vw; display: grid; grid: repeat(2, 50%) / auto-flow">
+            <div>Old wikitext:</div>
+            <textarea id="old-text" style="resize: none; margin: 4px; height:10em"></textarea>
+            <div>New wikitext:</div>
+            <textarea id="new-text" style="resize: none; margin: 4px; height:10em"></textarea>
+        </div>
+        <button id="compare">Compare</button>
+        <h3 hidden="true" id="error-lbl">Errors:</h3>
+        <ul hidden="true" id="errors"></ul>
+        <h3>Modified keys:</h3>
+        <ul id="modified-keys"></ul>
+        <h3>Removed keys:</h3>
+        <ul id="removed-keys"></ul>
+        <h3>Added keys:</h3>
+        <ul id="added-keys"></ul>
+    </div>
+</body>
+<script>
+    const compareBtn = document.getElementById("compare");
+    compareBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        const oldText = document.getElementById("old-text").value;
+        const newText = document.getElementById("new-text").value;
+        const result = compare(oldText, newText)
+        console.log(result);
+        
+        const removedList = document.getElementById("removed-keys");
+        const addedList = document.getElementById("added-keys");
+        const modifiedList = document.getElementById("modified-keys");
+        const errorList = document.getElementById("errors");
+        modifiedList.innerHTML = "";
+        addedList.innerHTML = "";
+        removedList.innerHTML = "";
+        errorList.innerHTML = "";
+
+        result.modified.forEach((l) => {
+            modifiedList.appendChild(l);
+        });
+        result.removed.forEach((l) => {
+            removedList.appendChild(l);
+        });
+        result.added.forEach((l) => {
+            addedList.appendChild(l);
+        });
+
+        //document.getElementById("removed-keys").innerText = result.removed;
+        //document.getElementById("added-keys").innerText = result.added;
+        //document.getElementById("modified-keys").innerText = result.modified;
+    });
+</script>
