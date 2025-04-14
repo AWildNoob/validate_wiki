@@ -5,23 +5,37 @@ function compare(oldText, newText) {
     const newPkmnText = [...newText.matchAll(pkmnRegex)];
     const oldPkmnEntries = new Map();
     const newPkmnEntries = new Map();
-    oldPkmnText.forEach((e) => {
+    oldPkmnText.forEach((e, idx) => {
         let keyStrings = e[0].substring(13, e[0].length - 2).split("|").map((s) => s.trim());
         let dataMap = new Map();
         keyStrings.forEach((s) => {
             const partition = s.split("=")
             dataMap.set(partition[0], partition[1])
         })
-        oldPkmnEntries.set(dataMap.get("pokemon"), dataMap);
+
+        const pkmnName = dataMap.get("pokemon");
+        if (oldPkmnEntries.has(pkmnName)) {
+            oldPkmnEntries.set(`${pkmnName} (${dataMap.get("ndex")}, ${idx})`, dataMap);
+        }
+        else {
+            oldPkmnEntries.set(pkmnName, dataMap);
+        }
     });
-    newPkmnText.forEach((e) => {
+    newPkmnText.forEach((e, idx) => {
         let keyStrings = e[0].substring(13, e[0].length - 2).split("|").map((s) => s.trim());
         let dataMap = new Map();
         keyStrings.forEach((s) => {
             const partition = s.split("=")
             dataMap.set(partition[0], partition[1])
         })
-        newPkmnEntries.set(dataMap.get("pokemon"), dataMap);
+
+        const pkmnName = dataMap.get("pokemon");
+        if (newPkmnEntries.has(pkmnName)) {
+            newPkmnEntries.set(`${pkmnName} (${dataMap.get("ndex")}, ${idx})`, dataMap);
+        }
+        else {
+            newPkmnEntries.set(pkmnName, dataMap);
+        }
     });
 
     // Perform Pokemon-by-Pokemon comparison
@@ -29,11 +43,13 @@ function compare(oldText, newText) {
     let removedOutput = []
     let modifiedOutput = []
     let errorOutput = []
-    oldPkmnEntries.values().forEach((oldEntry) => {
+    oldPkmnEntries.keys().forEach((pkmnName) => {
         // Find matching Pokemon entry
-        const pkmnName = oldEntry.get("pokemon");
+        const oldEntry = oldPkmnEntries.get(pkmnName);
         if (!newPkmnEntries.has(pkmnName)) {
-            errorOutput.push(`Old wikitext has ${pkmnName} but new wikitext does not`);
+            const errorEntry = document.createElement("li");
+            errorEntry.innerText = `Old wikitext has ${pkmnName} but new wikitext does not`
+            errorOutput.push(errorEntry);
             return;
         }
         const newEntry = newPkmnEntries.get(pkmnName);
@@ -62,20 +78,22 @@ function compare(oldText, newText) {
         // Format output
         if (addedKeys.length > 0) {
             const pkmnDisplay = document.createElement("b");
-            pkmnDisplay.appendChild(document.createTextNode(`${pkmnName}: `));
+            pkmnDisplay.appendChild(document.createTextNode(`${pkmnName}:`.padEnd(25, " ")));
     
             const addedEntry = document.createElement("li");
             addedEntry.appendChild(pkmnDisplay);
-            addedEntry.appendChild(document.createTextNode(addedKeys.join(" | ")));
+            addedEntry.appendChild(document.createElement("br"));
+            addedEntry.appendChild(document.createTextNode(addedKeys.map(s => s.padEnd(20, " ")).join(" ")));
             addedOutput.push(addedEntry);
         }
         if (removedKeys.length > 0) {
             const pkmnDisplay = document.createElement("b");
-            pkmnDisplay.appendChild(document.createTextNode(`${pkmnName}: `));
+            pkmnDisplay.appendChild(document.createTextNode(`${pkmnName}:`.padEnd(25, " ")));
     
             const removedEntry = document.createElement("li");
             removedEntry.appendChild(pkmnDisplay);
-            removedEntry.appendChild(document.createTextNode(removedKeys.join(" | ")));
+            removedEntry.appendChild(document.createElement("br"));
+            removedEntry.appendChild(document.createTextNode(removedKeys.map(s => s.padEnd(20, " ")).join(" ")));
             removedOutput.push(removedEntry);
         }
 

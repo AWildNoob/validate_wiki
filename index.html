@@ -11,13 +11,13 @@
         </div>
         <button id="compare">Compare</button>
         <h3 hidden="true" id="error-lbl">Errors:</h3>
-        <ul hidden="true" id="errors"></ul>
+        <ul id="errors"></ul>
         <h3>Modified keys:</h3>
-        <ul id="modified-keys"></ul>
+        <ul id="modified-keys" style="white-space-collapse: preserve-spaces"></ul>
         <h3>Removed keys:</h3>
-        <ul id="removed-keys"></ul>
+        <ul id="removed-keys" style="white-space-collapse: preserve-spaces"></ul>
         <h3>Added keys:</h3>
-        <ul id="added-keys"></ul>
+        <ul id="added-keys" style="white-space-collapse: preserve-spaces"></ul>
     </div>
 </body>
 <script>
@@ -33,6 +33,7 @@
         const addedList = document.getElementById("added-keys");
         const modifiedList = document.getElementById("modified-keys");
         const errorList = document.getElementById("errors");
+        const errorLbl = document.getElementById("error-lbl");
         modifiedList.innerHTML = "";
         addedList.innerHTML = "";
         removedList.innerHTML = "";
@@ -47,6 +48,15 @@
         result.added.forEach((l) => {
             addedList.appendChild(l);
         });
+        if (result.error.length > 0) {
+            errorLbl.hidden = false;
+            result.error.forEach((l) => {
+                errorList.appendChild(l);
+            });
+        }
+        else {
+            errorLbl.hidden = true;
+        }
 
         //document.getElementById("removed-keys").innerText = result.removed;
         //document.getElementById("added-keys").innerText = result.added;
