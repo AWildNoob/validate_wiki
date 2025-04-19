@@ -64,10 +64,66 @@ function compare(oldText, newText) {
         }
         const newEntry = newPkmnEntries.get(pkmnName);
 
+        // Detect changes in move order
+        let transposeChains = []
+        for (let i = 1; i <= 4; i++) {
+            if (oldEntry.has(`move${i}`)) {
+                let chain = []
+                let ptr = i;
+                do {
+                    /*
+                    for (let j = 1; j <= 4; j++) {
+                        if (ptr !== j && 
+                            newEntry.has(`move${j}`) && 
+                            newEntry.get(`move${j}`) === oldEntry.get(`move${ptr}`) &&
+                            newEntry.get(`move${j}type`) === oldEntry.get(`move${ptr}type`) &&
+                            newEntry.get(`move${j}cat`) === oldEntry.get(`move${ptr}cat`)
+                        ) {
+                            chain.push(ptr);
+                            ptr = j;
+                            break;
+                        }
+                    }
+                    if (chain.length === 0 || chain[chain.length - 1] === ptr) {
+                        chain = [];
+                        break;
+                    }
+                    */
+                   let nextIdx = [1, 2, 3, 4].find((nextPtr) => (
+                        ptr !== nextPtr && 
+                        newEntry.has(`move${nextPtr}`) && 
+                        newEntry.get(`move${nextPtr}`) === oldEntry.get(`move${ptr}`) &&
+                        newEntry.get(`move${nextPtr}type`) === oldEntry.get(`move${ptr}type`) &&
+                        newEntry.get(`move${nextPtr}cat`) === oldEntry.get(`move${ptr}cat`)
+                    ));
+                    if (nextIdx !== undefined) {
+                        chain.push(ptr);
+                        ptr = nextIdx;
+                    }
+                    else {
+                        chain = [];
+                        break;
+                    }
+                } while (ptr !== i && chain.length < 4);
+                if (chain.length > 0) {
+                    transposeChains.push(chain.map((cIdx, i) => { return { move: oldEntry.get(`move${cIdx}`), oldIdx: cIdx, newIdx: chain[(i + 1) % chain.length] };}));
+                    chain.forEach((cIdx) => {
+                        oldEntry.delete(`move${cIdx}`);
+                        newEntry.delete(`move${cIdx}`);
+                        oldEntry.delete(`move${cIdx}type`);
+                        newEntry.delete(`move${cIdx}type`);
+                        oldEntry.delete(`move${cIdx}cat`);
+                        newEntry.delete(`move${cIdx}cat`);
+                    });
+                }
+            }
+        }
+
         // Compare key-value pairs
         let addedKeys = []
         let removedKeys = []
         let modifiedKeys = []
+
         oldEntry.keys().forEach((k) => {
             const oldVal = oldEntry.get(k);
             const newVal = newEntry.get(k);
@@ -106,12 +162,17 @@ function compare(oldText, newText) {
             removedEntry.appendChild(document.createTextNode(removedKeys.map(s => s.padEnd(20, " ")).join(" ")));
             removedOutput.push(removedEntry);
         }
-
-        if (modifiedKeys.length > 0) {
+        if (modifiedKeys.length > 0 || transposeChains.length > 0) {
             const pkmnDisplay = document.createElement("b");
             pkmnDisplay.appendChild(document.createTextNode(`${pkmnName}: `));
-    
             modifiedOutput.push(pkmnDisplay);
+
+            let transposeEntry = document.createElement("li");
+            if (transposeChains.length > 0) {
+                const transposeMsg = transposeChains.map((c) => c.map((entry) => `${entry.move} (${entry.oldIdx} -> ${entry.newIdx})`).join(", ")).join(", ");
+                transposeEntry.appendChild(document.createTextNode(`Move order changed: ${transposeMsg}`));
+                modifiedOutput.push(transposeEntry);
+            }
             modifiedKeys.forEach((s) => {
                 const modifiedEntry = document.createElement("li");
                 modifiedEntry.appendChild(document.createTextNode(s));
