@@ -10,7 +10,7 @@ function compare(oldText, newText) {
         let dataMap = new Map();
         keyStrings.forEach((s) => {
             const partition = s.split("=")
-            dataMap.set(partition[0], partition[1])
+            dataMap.set(partition[0].trim(), partition[1].trim())
         })
 
         const pkmnName = dataMap.get("pokemon");
