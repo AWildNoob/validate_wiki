@@ -71,24 +71,6 @@ function compare(oldText, newText) {
                 let chain = []
                 let ptr = i;
                 do {
-                    /*
-                    for (let j = 1; j <= 4; j++) {
-                        if (ptr !== j && 
-                            newEntry.has(`move${j}`) && 
-                            newEntry.get(`move${j}`) === oldEntry.get(`move${ptr}`) &&
-                            newEntry.get(`move${j}type`) === oldEntry.get(`move${ptr}type`) &&
-                            newEntry.get(`move${j}cat`) === oldEntry.get(`move${ptr}cat`)
-                        ) {
-                            chain.push(ptr);
-                            ptr = j;
-                            break;
-                        }
-                    }
-                    if (chain.length === 0 || chain[chain.length - 1] === ptr) {
-                        chain = [];
-                        break;
-                    }
-                    */
                    let nextIdx = [1, 2, 3, 4].find((nextPtr) => (
                         ptr !== nextPtr && 
                         newEntry.has(`move${nextPtr}`) && 
@@ -170,7 +152,7 @@ function compare(oldText, newText) {
             let transposeEntry = document.createElement("li");
             if (transposeChains.length > 0) {
                 const transposeMsg = transposeChains.map((c) => c.map((entry) => `${entry.move} (${entry.oldIdx} -> ${entry.newIdx})`).join(", ")).join(", ");
-                transposeEntry.appendChild(document.createTextNode(`Move order changed: ${transposeMsg}`));
+                transposeEntry.appendChild(document.createTextNode(`<Move order changed>: ${transposeMsg}`));
                 modifiedOutput.push(transposeEntry);
             }
             modifiedKeys.forEach((s) => {
